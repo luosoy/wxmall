@@ -34,7 +34,7 @@
         <script type="text/javascript">
             var SYS = {
                 ctx: '${ctx}',
-                path: '${ctx}/',
+                path: '${ctx}/web/',
                 stc: '${stc}'
             };
         </script>
