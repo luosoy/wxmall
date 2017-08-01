@@ -29,7 +29,7 @@
     </servlet>
     <servlet-mapping>
         <servlet-name>springServlet</servlet-name>
-        <url-pattern>/*</url-pattern>
+        <url-pattern>/web/*</url-pattern>
     </servlet-mapping>
     
     <filter>
@@ -38,7 +38,7 @@
     </filter>
     <filter-mapping>
         <filter-name>shiroFilter</filter-name>
-        <url-pattern>/*</url-pattern>
+        <url-pattern>/web/*</url-pattern>
     </filter-mapping>
 
     <filter>
@@ -55,7 +55,7 @@
     </filter>
     <filter-mapping>
         <filter-name>encodingFilter</filter-name>
-        <url-pattern>/*</url-pattern>
+        <url-pattern>/web/*</url-pattern>
         <dispatcher>REQUEST</dispatcher>
         <dispatcher>FORWARD</dispatcher>
     </filter-mapping>
@@ -66,7 +66,7 @@
     </filter>
     <filter-mapping>
         <filter-name>sitemesh</filter-name>
-        <url-pattern>/*</url-pattern>
+        <url-pattern>/web/*</url-pattern>
     </filter-mapping>
 
     <session-config>
