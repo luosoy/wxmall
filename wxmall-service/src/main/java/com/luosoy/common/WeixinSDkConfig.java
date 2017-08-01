@@ -114,4 +114,9 @@ public class WeixinSDkConfig implements Serializable {
         this.cert_local_path = cert_local_path;
     }
 
+    @Override
+    public String toString() {
+        return "WeixinSDkConfig{" + "token=" + token + ", wx_app_id=" + wx_app_id + ", wx_app_secret=" + wx_app_secret + ", encryptMessage=" + encryptMessage + ", encodingAesKey=" + encodingAesKey + ", wx_mch_id=" + wx_mch_id + ", wx_notify_url=" + wx_notify_url + ", wx_secret_key=" + wx_secret_key + ", wx_sub_mch_id=" + wx_sub_mch_id + ", cert_local_path=" + cert_local_path + '}';
+    }
+
 }
