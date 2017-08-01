@@ -16,13 +16,11 @@ import org.apache.shiro.spring.web.ShiroFilterFactoryBean;
 public class OAuth2FilterFactoryBean extends ShiroFilterFactoryBean {
 
     private String loginUrl;
-    private String appid;
-    private String appsecret;
 
     @Override
     public String getLoginUrl() {
         if (StringUtils.isBlank(loginUrl)) {
-            loginUrl = OAuthClientConfig.OAUTH_URL
+            loginUrl = OAuthClientConfig.OAUTH_URL;
         }
         return loginUrl;
     }

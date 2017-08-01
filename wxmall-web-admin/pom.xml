@@ -20,7 +20,7 @@
     <dependencies>
         <dependency>
             <groupId>com.luosoy.wxmall</groupId>
-            <artifactId>wxmall-service-api</artifactId>
+            <artifactId>wxmall-service</artifactId>
             <version>${project.parent.version}</version>
         </dependency>
         <!-- mysql --> 

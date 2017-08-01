@@ -28,12 +28,14 @@
         <property name="proxyTargetClass" value="true" />
     </bean>
     
+    <bean id="oAuth2AuthenticationFilter" class="com.luosoy.wxmall.security.OAuth2AuthenticationFilter"/>
+    
     <!--shiro过滤器配置，bean的id值须与web中的filter-name的值相同 -->
     <!--<bean id="shiroFilter" class="com.luosoy.frame.security.CustomShiroFilterFactoryBean">-->
     <bean id="shiroFilter" class="org.apache.shiro.spring.web.ShiroFilterFactoryBean">
         <property name="securityManager" ref="securityManager" />
         <!--没有权限或者失败后跳转的页面--> 
-        <property name="loginUrl" value="/web/login" />		
+        <!--<property name="loginUrl" value="/web/login" />-->		
         <property name="successUrl" value="/web/index" />	
         <property name="unauthorizedUrl" value="/web/unauthorized" />
         <property name="filters">
@@ -51,6 +53,8 @@
             </value>
         </property>
     </bean>
+    
+
 
     <bean id="shiroRealm" class="com.luosoy.wxmall.security.OAuth2Realm"/>
 

@@ -30,7 +30,7 @@
     </context:component-scan>
 
     <import resource="classpath*:/spring/service-context.xml" />
-    <!--<import resource="classpath*:/spring/security/security-context.xml" />-->
+    <import resource="classpath*:/spring/security/security-context.xml" />
     <aop:aspectj-autoproxy />
 
 </beans>

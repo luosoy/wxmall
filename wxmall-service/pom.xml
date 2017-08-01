@@ -7,7 +7,7 @@
         <version>1.0-SNAPSHOT</version>
     </parent>
     <groupId>com.luosoy.wxmall</groupId>
-    <artifactId>wxmall-service-api</artifactId>
+    <artifactId>wxmall-service</artifactId>
     <packaging>jar</packaging>
     <name>${project.artifactId}</name>
     <properties>

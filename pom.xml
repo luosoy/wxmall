@@ -20,8 +20,8 @@
     
     <modules>
         <module>weixin-sdk</module>
-        <module>wxmall-service-api</module>
         <module>wxmall-web-admin</module>
         <module>wxmall-web-mobile</module>
+        <module>wxmall-service</module>
     </modules>
 </project>
