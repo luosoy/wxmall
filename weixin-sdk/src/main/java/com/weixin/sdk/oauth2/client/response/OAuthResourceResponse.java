@@ -18,6 +18,7 @@ package com.weixin.sdk.oauth2.client.response;
 
 import com.weixin.sdk.oauth2.client.validator.ResourceValidator;
 import com.weixin.sdk.oauth2.common.exception.OAuthProblemException;
+import com.weixin.sdk.oauth2.common.utils.JSONUtils;
 import com.weixin.sdk.oauth2.common.utils.OAuthUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -27,7 +28,7 @@ import java.io.InputStream;
 import java.util.List;
 import java.util.Map;
 
-public class OAuthResourceResponse  extends OAuthClientResponse {
+public class OAuthResourceResponse extends OAuthClientResponse {
 
     private static final Logger LOG = LoggerFactory.getLogger(OAuthResourceResponse.class);
 
@@ -66,6 +67,7 @@ public class OAuthResourceResponse  extends OAuthClientResponse {
     @Override
     protected void setBody(InputStream body) throws OAuthProblemException {
         this.inputStream = body;
+        parameters = JSONUtils.parseJSON(getBody());
     }
 
     @Override
