@@ -1,6 +1,7 @@
 package com.luosoy.wxmall.security;
 
-import com.weixin.sdk.api.ApiResult;
+import com.luosoy.common.config.WeixinSDkConfig;
+import com.luosoy.dto.OAuthUserInfoDTO;
 import com.weixin.sdk.oauth2.client.OAuthClient;
 import com.weixin.sdk.oauth2.client.OAuthClientConfig;
 import com.weixin.sdk.oauth2.client.URLConnectionClient;
@@ -23,18 +24,20 @@ import org.apache.shiro.realm.AuthorizingRealm;
 import org.apache.shiro.subject.PrincipalCollection;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 
 public class OAuth2Realm extends AuthorizingRealm {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(OAuth2Realm.class);
-
-    private String appid;
-    private String appsecret;
+    
+    @Autowired
+    private WeixinSDkConfig wxSdkConfig;
     private String redirectUrl;
 
     public void setRedirectUrl(String redirectUrl) {
         this.redirectUrl = redirectUrl;
     }
+    
 
     @Override
     public boolean supports(AuthenticationToken token) {
@@ -55,20 +58,19 @@ public class OAuth2Realm extends AuthorizingRealm {
             LOGGER.error("code is blank,please check callback url");
             throw new AuthenticationException("code is blank,please check callback url");
         }
-        ApiResult userInfo = getUserInfor(code);
+        OAuthUserInfoDTO userInfo = getUserInfor(code);
         SimpleAuthenticationInfo authenticationInfo = new SimpleAuthenticationInfo(userInfo, code, getName());
         return authenticationInfo;
     }
 
-    private ApiResult getUserInfor(String code) {
+    private OAuthUserInfoDTO getUserInfor(String code) {
 
         try {
             OAuthClient oAuthClient = new OAuthClient(new URLConnectionClient());
-
             OAuthClientRequest accessTokenRequest = OAuthClientRequest
                     .tokenLocation(OAuthClientConfig.OAUTH_URL_ACCESS_TOKEN)
-                    .setAppid(appid)
-                    .setAppsecret(appsecret)
+                    .setAppid(wxSdkConfig.getWx_app_id())
+                    .setAppsecret(wxSdkConfig.getWx_app_secret())
                     .setCode(code)
                     .setRedirectURI(redirectUrl)
                     .setGrantType(GrantType.AUTHORIZATION_CODE)
@@ -76,7 +78,7 @@ public class OAuth2Realm extends AuthorizingRealm {
                     .buildQueryMessage();
 
             OAuthAccessTokenResponse oAuthResponse = oAuthClient.accessToken(accessTokenRequest, OAuth.HttpMethod.POST);
-            if (oAuthResponse.getErrorCode() != null) {
+            if (StringUtils.isNotBlank(oAuthResponse.getErrorCode())) {
                 LOGGER.error(oAuthResponse.getErrorMsg());
                 throw new RuntimeException(oAuthResponse.getErrorMsg());
             }
@@ -91,12 +93,22 @@ public class OAuth2Realm extends AuthorizingRealm {
                     .setLang("zh_CN").buildQueryMessage();
 
             OAuthResourceResponse resourceResponse = oAuthClient.resource(userInfoRequest, OAuth.HttpMethod.GET, OAuthResourceResponse.class);
-            ApiResult userInfo = ApiResult.create(resourceResponse.getBody());
-            if (userInfo.getErrorCode() != null) {
-                LOGGER.error(userInfo.getErrorMsg());
-                throw new AuthenticationException(userInfo.getErrorMsg());
+            if (StringUtils.isNotBlank(resourceResponse.getParam("errcode"))) {
+                LOGGER.error(resourceResponse.getParam("errmsg"));
+                throw new AuthenticationException(resourceResponse.getParam("errmsg"));
             }
-            return userInfo;
+            OAuthUserInfoDTO userInfoDTO = new OAuthUserInfoDTO();
+            userInfoDTO.setAccessToken(accessToken);
+            userInfoDTO.setOpenid(openid);
+            userInfoDTO.setExpiresIn(expiresIn);
+            userInfoDTO.setNickname(resourceResponse.getParam("nickname"));
+            userInfoDTO.setSex(resourceResponse.getParam("sex"));
+            userInfoDTO.setLanguage(resourceResponse.getParam("language"));
+            userInfoDTO.setCity(resourceResponse.getParam("city"));
+            userInfoDTO.setProvince(resourceResponse.getParam("province"));
+            userInfoDTO.setCountry(resourceResponse.getParam("country"));
+            userInfoDTO.setHeadimgurl(resourceResponse.getParam("headimgurl"));
+            return userInfoDTO;
         } catch (OAuthProblemException | OAuthSystemException | AuthenticationException ex) {
             LOGGER.error(ex.getMessage());
             throw new AuthenticationException(ex);

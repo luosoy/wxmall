@@ -1,5 +1,8 @@
 package com.luosoy.wxmall.security;
 
+import com.luosoy.common.config.WeixinSDkConfig;
+import com.luosoy.frame.exception.SystemException;
+import com.weixin.sdk.oauth2.client.OAuthClientConfig;
 import org.apache.shiro.authc.AuthenticationException;
 import org.apache.shiro.authc.AuthenticationToken;
 import org.apache.shiro.subject.Subject;
@@ -11,6 +14,11 @@ import javax.servlet.ServletRequest;
 import javax.servlet.ServletResponse;
 import javax.servlet.http.HttpServletRequest;
 import java.io.IOException;
+import java.io.UnsupportedEncodingException;
+import java.net.URLEncoder;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 
 /**
  * <p>
@@ -22,29 +30,14 @@ import java.io.IOException;
  */
 public class OAuth2AuthenticationFilter extends AuthenticatingFilter {
 
+    private static final Logger LOGGER = LoggerFactory.getLogger(OAuth2AuthenticationFilter.class);
+    @Autowired
+    private WeixinSDkConfig wxSdkConfig;
     //oauth2 authc code参数名
     private String authcCodeParam = "code";
-    //客户端id
-    private String clientId;
-    //服务器端登录成功/失败后重定向到的客户端地址
-    private String redirectUrl;
     //oauth2服务器响应类型
     private String responseType = "code";
-
     private String failureUrl;
-
-
-    public void setClientId(String clientId) {
-        this.clientId = clientId;
-    }
-
-    public void setRedirectUrl(String redirectUrl) {
-        this.redirectUrl = redirectUrl;
-    }
-
-    public void setResponseType(String responseType) {
-        this.responseType = responseType;
-    }
 
     public void setFailureUrl(String failureUrl) {
         this.failureUrl = failureUrl;
@@ -59,7 +52,7 @@ public class OAuth2AuthenticationFilter extends AuthenticatingFilter {
 
     @Override
     protected boolean isAccessAllowed(ServletRequest request, ServletResponse response, Object mappedValue) {
-        return false;
+        return getSubject(request, response).isAuthenticated();
     }
 
     @Override
@@ -75,6 +68,7 @@ public class OAuth2AuthenticationFilter extends AuthenticatingFilter {
         if (!subject.isAuthenticated()) {
             if (StringUtils.isEmpty(request.getParameter(authcCodeParam))) {
                 //如果用户没有身份验证，且没有auth code，则重定向到服务端授权
+                setLoginUrl(getOAuth2LoginUrl(request));
                 saveRequestAndRedirectToLogin(request, response);
                 return false;
             }
@@ -97,17 +91,37 @@ public class OAuth2AuthenticationFilter extends AuthenticatingFilter {
         if (subject.isAuthenticated() || subject.isRemembered()) {
             try {
                 issueSuccessRedirect(request, response);
-            } catch (Exception e) {
-                e.printStackTrace();
+            } catch (Exception ex) {
+                LOGGER.error(ex.getMessage());
+                throw new SystemException(ex.getMessage(), SystemException.REQUEST_EXCEPTION);
             }
         } else {
             try {
                 WebUtils.issueRedirect(request, response, failureUrl);
-            } catch (IOException e) {
-                e.printStackTrace();
+            } catch (IOException ex) {
+                LOGGER.error(ex.getMessage());
+                throw new SystemException(ex.getMessage(), SystemException.REQUEST_EXCEPTION);
             }
         }
         return false;
+    }
+
+    private String getOAuth2LoginUrl(ServletRequest request) throws UnsupportedEncodingException {
+        StringBuilder rurl = new StringBuilder("http://");
+        rurl.append(request.getServerName());
+        int port = request.getServerPort();
+        if (port != 80) {
+            rurl.append(":").append(port);
+        }
+        rurl.append(request.getServletContext().getContextPath()).append(getSuccessUrl());
+        StringBuilder loginUrl = new StringBuilder(OAuthClientConfig.OAUTH_URL);
+        loginUrl.append("?appid=").append(wxSdkConfig.getWx_app_id())
+                .append("&redirect_uri=").append(URLEncoder.encode(rurl.toString(), "utf-8"))
+                .append("&response_type=").append(responseType)
+                .append("&scope=").append(OAuthClientConfig.SNSSCOPE_USERINFO)
+                .append("&state=STATE#wechat_redirect");
+
+        return loginUrl.toString();
     }
 
 }
