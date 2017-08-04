@@ -32,11 +32,7 @@ public class OAuth2Realm extends AuthorizingRealm {
     
     @Autowired
     private WeixinSDkConfig wxSdkConfig;
-    private String redirectUrl;
 
-    public void setRedirectUrl(String redirectUrl) {
-        this.redirectUrl = redirectUrl;
-    }
     
 
     @Override
@@ -72,7 +68,6 @@ public class OAuth2Realm extends AuthorizingRealm {
                     .setAppid(wxSdkConfig.getWx_app_id())
                     .setAppsecret(wxSdkConfig.getWx_app_secret())
                     .setCode(code)
-                    .setRedirectURI(redirectUrl)
                     .setGrantType(GrantType.AUTHORIZATION_CODE)
                     .setView("web")
                     .buildQueryMessage();
