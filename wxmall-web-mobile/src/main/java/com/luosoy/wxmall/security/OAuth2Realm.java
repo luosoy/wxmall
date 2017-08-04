@@ -29,11 +29,10 @@ import org.springframework.beans.factory.annotation.Autowired;
 public class OAuth2Realm extends AuthorizingRealm {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(OAuth2Realm.class);
-    
+
     @Autowired
     private WeixinSDkConfig wxSdkConfig;
 
-    
 
     @Override
     public boolean supports(AuthenticationToken token) {
