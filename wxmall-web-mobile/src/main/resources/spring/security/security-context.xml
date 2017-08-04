@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <beans xmlns="http://www.springframework.org/schema/beans"
        xmlns:context="http://www.springframework.org/schema/context"
-       xmlns:jaxws="http://cxf.apache.org/jaxws" xmlns:jaxrs="http://cxf.apache.org/jaxrs"
+       xmlns:jaxws="http://cxf.apache.org/jaxws"
        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:tx="http://www.springframework.org/schema/tx"
        xmlns:aop="http://www.springframework.org/schema/aop" xmlns:util="http://www.springframework.org/schema/util"
        xsi:schemaLocation="http://www.springframework.org/schema/beans 
@@ -28,14 +28,17 @@
         <property name="proxyTargetClass" value="true" />
     </bean>
     
-    <bean id="oAuth2AuthenticationFilter" class="com.luosoy.wxmall.security.OAuth2AuthenticationFilter"/>
-    
+    <bean id="oAuth2AuthenticationFilter" class="com.luosoy.wxmall.security.OAuth2AuthenticationFilter">
+        <property name="failureUrl" value=""></property>
+    </bean>
+
     <!--shiro过滤器配置，bean的id值须与web中的filter-name的值相同 -->
     <!--<bean id="shiroFilter" class="com.luosoy.frame.security.CustomShiroFilterFactoryBean">-->
     <bean id="shiroFilter" class="org.apache.shiro.spring.web.ShiroFilterFactoryBean">
         <property name="securityManager" ref="securityManager" />
         <!--没有权限或者失败后跳转的页面--> 
-        <!--<property name="loginUrl" value="/web/login" />-->		
+
+        <!--<property name="loginUrl" value="/web/login" />-->
         <property name="successUrl" value="/web/index" />	
         <property name="unauthorizedUrl" value="/web/unauthorized" />
         <property name="filters">
@@ -47,7 +50,6 @@
             <value>
                 /web/login = anon
                 /web/dologin = anon
-                /web/unauthorized = anon
                 /web/index = oauth2Authc
                 /web/** = oauth2Authc
             </value>

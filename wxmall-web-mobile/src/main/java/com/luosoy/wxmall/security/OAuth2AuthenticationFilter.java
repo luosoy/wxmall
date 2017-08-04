@@ -20,14 +20,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 
-/**
- * <p>
- * User: Zhang Kaitao
- * <p>
- * Date: 14-2-18
- * <p>
- * Version: 1.0
- */
+
 public class OAuth2AuthenticationFilter extends AuthenticatingFilter {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(OAuth2AuthenticationFilter.class);
